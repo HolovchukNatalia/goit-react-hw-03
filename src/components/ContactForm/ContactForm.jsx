@@ -1,5 +1,6 @@
 import React, { useId } from "react";
-import { Formik, Form, Field } from "formik";
+import css from "./ContactForm.module.css";
+import { Formik, Form, Field, ErrorMessage } from "formik";
 import { nanoid } from "nanoid";
 import * as Yup from "yup";
 
@@ -10,10 +11,13 @@ const initialValues = {
 const validationSchema = Yup.object().shape({
   name: Yup.string()
     .min(2, "Too Short!")
+    .trim()
     .max(50, "Too Long!")
+    .trim()
     .required("Required"),
   number: Yup.string()
     .matches(/^\+?\d{7,11}$/, "Number must be 7-11 digits")
+    .trim()
     .required("Required"),
 });
 
@@ -37,29 +41,33 @@ const ContactForm = ({ addContact }) => {
       onSubmit={handleSubmit}
       validationSchema={validationSchema}
     >
-      {({ errors, touched }) => (
+      {({ isSubmit, isValid }) => (
         <Form>
           <div>
             <label htmlFor={nameId}>Name</label>
             <br />
             <Field type="text" name="name" id={nameId} />
-            {errors.name && touched.name && (
-              <div style={{ color: "red", fontSize: "12px" }}>
-                {errors.name}
-              </div>
-            )}
+            <br />
+            <ErrorMessage
+              className={css.error}
+              component="div"
+              name="name"
+            ></ErrorMessage>
           </div>
           <div>
             <label htmlFor={numberId}>Number</label>
             <br />
             <Field type="text" name="number" id={numberId} />
-            {errors.number && touched.number && (
-              <div style={{ color: "red", fontSize: "12px" }}>
-                {errors.number}
-              </div>
-            )}
+            <br />
+            <ErrorMessage
+              className={css.error}
+              component="div"
+              name="number"
+            ></ErrorMessage>
           </div>
-          <button type="submit">Add contact</button>
+          <button type="submit" disabled={isSubmit || !isValid}>
+            Add contact
+          </button>
         </Form>
       )}
     </Formik>
